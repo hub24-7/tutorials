@@ -1,0 +1,204 @@
+
+
+Wilkommen in meinem Python-Crashkurs (von Konrad). Wenn ihr die euch präsentierten Code-Beispiele verstanden habt, könnt ihr mit ihnen herumspielen.
+
+print() ist eine Funktion. Sie gibt Text aus und nimmt dafür den Wert, der in den Klammern steht. print() kann auch mehrere Werte nehmen. Die Funktion print() hat keinen Rückgabewert.
+
+ein Rückgabewert ist ein Wert, den eine Funktion zurückgibt. Diesen kann man dann weiter benutzen , um ihn z.B. einer Variable(was das ist lernen wir später) zuzuweisen oder eine Funktion mit ihm aufzurufen
+
+Alles was nach einem # in der gleichen Zeile steht ist ein Kommentar
+
+Es gibt verschiedene Datentypen, davon schauen wir uns jetzt Strings(das ist roher Text, der mit ""-Zeichen umgeben ist) und Zahlen an.
+
+print(5)
+print("ich mag Boote")
+print("die Superzahl ist",6)
+#strings und integer können beide durch print() ausgegeben werden
+     
+
+5
+ich mag Boote
+die Superzahl ist 6
+
+Mache jetzt die Übung 1
+
+mit der Funktion type() kann man den Datentyp eines Wertes erfahren. (Diese Funktion wird in richtigen Programmen so gut wie nie benutzt, aber es ist gut zu Wissen, wie man den Datentyp eines Wertes erfahren kann)
+
+Man unterscheidet zwischen ganzen Zahlen(integer, kurz int) und Kommazahlen(float)
+
+print(type(3))#integer, also ganze Zahl
+print(type(3.0))#float, also Kommazahl
+print(type("3"))#string, weil es in Anführungszeichen ist
+     
+
+<class 'int'>
+<class 'float'>
+<class 'str'>
+
+Es gibt Rechenoperationen.
+
+print(1+1)#plus
+print(4-3)#minus
+print(5*5)#mal
+print(8/7)#durch
+print(2**5)#exponent
+print(11%5)#modulo. Lernt man nicht in der Schule, ist aber für Programmierer wichtig. Es ist wie teilen mit Rest, aber der Rest ist das Ergebnis.
+     
+
+2
+1
+25
+1.1428571428571428
+32
+1
+
+Mache jetzt Übung 2
+
+Mit Strings können keine Mathematische Operationen durchgeführt werden. Trotzdem passiert etwas, wenn man + oder * auf einen String anwendet.
+
+Wenn ein String + gerechnet wird, wird der Text zusammengefügt.
+
+Wenn ein String mit einem Integer zusammen * gerechnet wird, wird der Text soundsoviel mal kopiert
+
+print("bla"+" blubb")
+print("bla"*5)
+     
+
+bla blubb
+blablablablabla
+
+Wenn mehrere Rechenoperatoren in einer Codezeile verwendet werden, git punkt vor strich und links vor rechts.
+
+Man kann die Reihenfolge aber durch runde Klammern ändern. Es können beliebig viele runde Klammern verwendet werden.
+
+print(1+2*3)
+print((1+2)*3)
+     
+
+7
+9
+
+mache jetzt die Übung 3
+
+Der operator / gibt immer eine Float zurück.
+
+Der Ergebnistyp der anderen Rechenoperatoren hängt davon ab, ob die Operation mit Integern oder mit Floats durchgeführt wird.
+
+Wenn ein Integer und ein Float in der gleichen Operation verwendet wird, wird der Integer in ein Float umgewandelt.
+
+print(type(1+1))#zwei integer
+print(type(1.0+1.0))#zwei floats
+print(type(1+1.0))#integer und float, durch Typenumwandlung wurde der integer aber zu float umgewandelt
+     
+
+<class 'int'>.DATA
+	SCREEN = $F000
+.CODE
+	LOAD R0 SCREEN
+	LOAD R1 $0123
+	LOAD R2 $4567
+	LOAD R3 $89AB
+	LOAD R4 $CDEF
+	
+LOOP:
+	STORE R1 R0
+	INC R0
+	STORE R2 R0
+	INC R0
+	STORE R3 R0
+	INC R0
+	STORE R4 R0
+	INC R0
+	JMP LOOP
+	
+	
+;ORG $F000
+.INC "PAGODA.BIN"	
+;4x4 pixel ball bounces around the screen
+
+.DATA
+	SCREEN = $F000
+	DIRX = $0000
+	DIRY = $0000
+	COLOR = $1111
+	LOCATION = $FC81
+.CODE
+	LOAD R0 #0
+	LOAD R15 SCREEN
+	LOAD R1 #124
+	LOAD R2 COLOR
+	LOAD R3 DIRX
+	LOAD R4 DIRY
+	LOAD R5 LOCATION
+	;TMP VARS
+	LOAD R13 $20
+
+BOUNCE:
+	;DIR 0 IS --
+	;DIR 1 IS ++
+	JMP DRAWBALL
+	FROMDRAWBALL:
+	;JMP ERASEBALL
+	;FROMERASEBALL:
+	JMP MOVEBALL	
+
+DRAWBALL:
+	TRAN R5 R14
+	STORE R2 R14
+	CLC
+	ADD R14 R13
+	STORE R2 R14
+	ADD R14 R13
+	STORE R2 R14
+	ADD R14 R13
+	STORE R2 R14
+	JMP FROMDRAWBALL
+
+ERASEBALL:	
+	TRAN R5 R14
+	STORE R0 R14
+	CLC
+	ADD R14 R13
+	STORE R0 R14
+	ADD R14 R13
+	STORE R0 R14
+	ADD R14 R13
+	STORE R0 R14
+	;JMP FROMERASEBALL
+	
+MOVEBALL:
+	;CHECK Y
+	TRAN R5 R14
+	LOAD R12 $0FFF
+	AND R14 R12
+	LOAD R12 $0080
+	DIV R14 R12
+	TRAN R12 R11	;KEEP X LOCATION IN R11
+		JMP YMOVE
+		AFTERYMOVE:
+	CMP R14 R0
+	JEQ SWITCHDIRY
+	LOAD R12 $001F
+	CMP R14 R12
+	JEQ SWITCHDIRY
+	
+	RESETLOCY:
+	LOAD R12 $0080
+	MULT R14 R12
+	LOAD R12 $F000
+	OR R14 R12
+	TRAN R14 R5
+
+
+		DEC R11
+		JMP AFTERXMOVE		
+		
+SWITCHDIRY:
+	LOAD R12 $0001
+	XOR R4 R12
+	JMP RESETLOCY
+	
+SWITCHDIRX:
+	LOAD R12 $0001
+	XOR R3 R12
+	JMP RESETLOCX
